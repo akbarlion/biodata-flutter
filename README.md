@@ -1,16 +1,50 @@
-# biodatamahasiswa
+# Biodata Mahasiswa Flutter Dengan Konfigurasi API Laravel
 
-A new Flutter project.
+A Flutter project for a simple “biodata mahasiswa” application — a basic mobile/web app to display and manage student biodata.
 
-## Getting Started
+## Table of Contents
 
-This project is a starting point for a Flutter application.
+- [About](#about)  
+- [Features](#features)  
+- [Getting Started](#getting-started)  
+- [Prerequisites](#prerequisites)  
+- [Installation / Setup](#installation-setup)  
+- [Usage](#usage)  
+- [Project Structure](#project-structure)  
+- [Configuration](#configuration)  
+- [Contributing](#contributing)  
+- [License](#license)  
+- [Acknowledgements](#acknowledgements)  
 
-A few resources to get you started if this is your first Flutter project:
+## About  
+This project is a starter Flutter application that lets you display, add, edit, and delete student biodata (name, ID, program of study, etc.). It is built with Flutter and supports Android, iOS, Web, Windows, macOS, Linux.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Features  
+- Cross-platform: works on Android, iOS, Web, Windows, macOS, Linux.  
+- Simple UI for listing biodata entries.  
+- Add new biodata (name, student number (NIM), major/program, photo, etc).  
+- Edit and delete existing entries.  
+- Persist data locally (or optionally connect to backend / cloud in future).  
+- Responsive layout for mobile and web.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Getting Started  
+
+### Prerequisites  
+- [Flutter SDK](https://docs.flutter.dev) installed and configured.  
+- A compatible editor (e.g. VS Code, Android Studio).  
+- Device or emulator/simulator for testing (mobile or web).  
+
+### Installation / Setup  
+```bash
+# Clone the repository  
+git clone https://github.com/LazyDims/biodata-flutter.git  
+cd biodata-flutter  
+
+# Get dependencies  
+flutter pub get  
+
+# Run the app (example for mobile)  
+flutter run  
+
+# Run for web  
+flutter run -d chrome  
