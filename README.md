@@ -37,7 +37,7 @@ This project is a starter Flutter application that lets you display, add, edit, 
 ### Installation / Setup  
 ```bash
 # Clone the repository  
-git clone https://github.com/LazyDims/biodata-flutter.git  
+git clone https://github.com/akbarlion/biodata-flutter.git
 cd biodata-flutter  
 
 # Get dependencies  
