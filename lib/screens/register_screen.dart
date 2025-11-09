@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'login_screen.dart';
+import 'dart:ui';
+import '../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -10,7 +9,7 @@ class RegisterScreen extends StatefulWidget {
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStateMixin {
   final TextEditingController namaController = TextEditingController();
   final TextEditingController nimController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -18,209 +17,340 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController fakultasController = TextEditingController();
   final TextEditingController prodiController = TextEditingController();
   final TextEditingController angkatanController = TextEditingController();
-
-  final _formKey = GlobalKey<FormState>();
-
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  final _formKey = GlobalKey<FormState>();
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   Future<void> registerMahasiswa() async {
     setState(() => _isLoading = true);
-
-    var url = Uri.parse("http://127.0.0.1:8000/api/mahasiswa/register");
-    var response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "nama": namaController.text,
-        "nim": nimController.text,
-        "email": emailController.text,
-        "password": passwordController.text,
-        "fakultas": fakultasController.text,
-        "prodi": prodiController.text,
-        "angkatan": angkatanController.text,
-      }),
-    );
-
+    final api = ApiService();
+    final success = await api.register({
+      'nama': namaController.text.trim(),
+      'nim': nimController.text.trim(),
+      'email': emailController.text.trim(),
+      'password': passwordController.text,
+      'fakultas': fakultasController.text.trim(),
+      'prodi': prodiController.text.trim(),
+      'angkatan': angkatanController.text.trim(),
+    });
     setState(() => _isLoading = false);
 
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      if (data["status"] == "success") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registrasi berhasil!")),
-        );
-        // Use animated route to go to login
-        Navigator.of(context).pushReplacement(_createRoute(const LoginScreen()));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data["message"] ?? "Registrasi gagal")),
-        );
-      }
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registrasi berhasil!")),
+      );
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${response.statusCode}")),
+        const SnackBar(content: Text("Registrasi gagal")),
       );
     }
   }
 
-  Route _createRoute(Widget page) {
-    return PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 450),
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final offsetTween = Tween(begin: const Offset(0, 0.25), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.easeOut));
-        return SlideTransition(
-          position: animation.drive(offsetTween),
-          child: FadeTransition(opacity: animation, child: child),
-        );
-      },
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    required String? Function(String?) validator,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+          prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.8)),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(16),
+        ),
+        validator: validator,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Gradient background for a modern look
-      appBar: AppBar(title: const Text("Register Mahasiswa")),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Color(0xFF667eea),
+              Color(0xFF764ba2),
+              Color(0xFF6B73FF),
+            ],
           ),
         ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              elevation: 10,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
+        child: SafeArea(
+          child: AnimatedBuilder(
+            animation: _slideAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _slideAnimation.value),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Buat Akun Baru',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: namaController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nama',
-                          prefixIcon: Icon(Icons.person),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: nimController,
-                        decoration: const InputDecoration(
-                          labelText: 'NIM',
-                          prefixIcon: Icon(Icons.badge),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'NIM wajib diisi' : null,
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) => (v == null || !v.contains('@')) ? 'Email tidak valid' : null,
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) => (v == null || v.length < 6) ? 'Minimal 6 karakter' : null,
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: fakultasController,
-                        decoration: const InputDecoration(
-                          labelText: 'Fakultas',
-                          prefixIcon: Icon(Icons.account_balance),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: prodiController,
-                        decoration: const InputDecoration(
-                          labelText: 'Prodi',
-                          prefixIcon: Icon(Icons.school),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: angkatanController,
-                        decoration: const InputDecoration(
-                          labelText: 'Angkatan',
-                          prefixIcon: Icon(Icons.calendar_today),
-                          border: OutlineInputBorder(),
+                      // Back Button
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                            elevation: 6,
-                          ),
-                          onPressed: _isLoading
-                              ? null
-                              : () {
-                                  if (_formKey.currentState?.validate() ?? false) {
-                                    registerMahasiswa();
-                                  }
-                                },
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    key: ValueKey('loading'),
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                                  )
-                                : const Text('Daftar', key: ValueKey('text')),
-                          ),
+                      
+                      // Header
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.2),
+                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.person_add,
+                          size: 40,
+                          color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      TextButton(
-                        onPressed: _isLoading
-                            ? null
-                            : () {
-                                Navigator.of(context).pushReplacement(_createRoute(const LoginScreen()));
-                              },
-                        child: const Text("Sudah punya akun? Login di sini"),
+                      const SizedBox(height: 24),
+                      
+                      // Glass Card
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            padding: const EdgeInsets.all(32),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    'Create Account',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Daftar sebagai mahasiswa baru',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  
+                                  _buildTextField(
+                                    controller: namaController,
+                                    label: 'Nama Lengkap',
+                                    icon: Icons.person_outline,
+                                    validator: (v) => (v == null || v.isEmpty) ? 'Nama tidak boleh kosong' : null,
+                                  ),
+                                  
+                                  _buildTextField(
+                                    controller: nimController,
+                                    label: 'NIM',
+                                    icon: Icons.badge_outlined,
+                                    validator: (v) => (v == null || v.isEmpty) ? 'NIM tidak boleh kosong' : null,
+                                  ),
+                                  
+                                  _buildTextField(
+                                    controller: emailController,
+                                    label: 'Email',
+                                    icon: Icons.email_outlined,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (v) => (v == null || !v.contains('@')) ? 'Email tidak valid' : null,
+                                  ),
+                                  
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                    ),
+                                    child: TextFormField(
+                                      controller: passwordController,
+                                      obscureText: _obscurePassword,
+                                      style: const TextStyle(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        labelText: 'Password',
+                                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                        prefixIcon: Icon(Icons.lock_outline, color: Colors.white.withOpacity(0.8)),
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                            color: Colors.white.withOpacity(0.8),
+                                          ),
+                                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                        ),
+                                        border: InputBorder.none,
+                                        contentPadding: const EdgeInsets.all(16),
+                                      ),
+                                      validator: (v) => (v == null || v.length < 6) ? 'Minimal 6 karakter' : null,
+                                    ),
+                                  ),
+                                  
+                                  _buildTextField(
+                                    controller: fakultasController,
+                                    label: 'Fakultas',
+                                    icon: Icons.school_outlined,
+                                    validator: (v) => (v == null || v.isEmpty) ? 'Fakultas tidak boleh kosong' : null,
+                                  ),
+                                  
+                                  _buildTextField(
+                                    controller: prodiController,
+                                    label: 'Program Studi',
+                                    icon: Icons.book_outlined,
+                                    validator: (v) => (v == null || v.isEmpty) ? 'Program Studi tidak boleh kosong' : null,
+                                  ),
+                                  
+                                  _buildTextField(
+                                    controller: angkatanController,
+                                    label: 'Angkatan',
+                                    icon: Icons.calendar_today_outlined,
+                                    keyboardType: TextInputType.number,
+                                    validator: (v) => (v == null || v.isEmpty) ? 'Angkatan tidak boleh kosong' : null,
+                                  ),
+                                  
+                                  const SizedBox(height: 16),
+                                  
+                                  // Register Button
+                                  Container(
+                                    width: double.infinity,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                                      ),
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                      ),
+                                      onPressed: _isLoading
+                                          ? null
+                                          : () {
+                                              if (_formKey.currentState?.validate() ?? false) {
+                                                registerMahasiswa();
+                                              }
+                                            },
+                                      child: _isLoading
+                                          ? const SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Daftar Sekarang',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  
+                                  // Login Link
+                                  TextButton(
+                                    onPressed: _isLoading ? null : () => Navigator.pop(context),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Sudah punya akun? ',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.8),
+                                          fontSize: 16,
+                                        ),
+                                        children: const [
+                                          TextSpan(
+                                            text: 'Masuk di sini',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              decoration: TextDecoration.underline,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),
