@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../models/mahasiswa.dart';
 import '../services/api_service.dart';
+import 'add_edit_mahasiswa_screen.dart';
 
 class MahasiswaListScreen extends StatefulWidget {
   const MahasiswaListScreen({Key? key}) : super(key: key);
@@ -44,6 +45,40 @@ class _MahasiswaListScreenState extends State<MahasiswaListScreen> with TickerPr
       isLoading = false;
     });
     _animationController.forward();
+  }
+
+  Future<void> _deleteMahasiswa(Mahasiswa mahasiswa) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Mahasiswa'),
+        content: Text('Yakin ingin menghapus ${mahasiswa.nama}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await api.deleteMahasiswa(mahasiswa.id);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Mahasiswa berhasil dihapus')),
+        );
+        _loadMahasiswa();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal menghapus mahasiswa')),
+        );
+      }
+    }
   }
 
   Widget _buildMahasiswaCard(Mahasiswa mahasiswa, int index) {
@@ -132,23 +167,30 @@ class _MahasiswaListScreenState extends State<MahasiswaListScreen> with TickerPr
                       ),
                     ),
                     
-                    // Angkatan Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                    // Actions
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddEditMahasiswaScreen(
+                                  mahasiswa: mahasiswa,
+                                  isEdit: true,
+                                ),
+                              ),
+                            );
+                            if (result == true) _loadMahasiswa();
+                          },
+                          icon: const Icon(Icons.edit, color: Color(0xFF667eea)),
                         ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        mahasiswa.angkatan,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        IconButton(
+                          onPressed: () => _deleteMahasiswa(mahasiswa),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -195,6 +237,18 @@ class _MahasiswaListScreenState extends State<MahasiswaListScreen> with TickerPr
                       ),
                     ),
                     const Spacer(),
+                    IconButton(
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AddEditMahasiswaScreen(),
+                          ),
+                        );
+                        if (result == true) _loadMahasiswa();
+                      },
+                      icon: const Icon(Icons.add, color: Colors.white),
+                    ),
                     IconButton(
                       onPressed: _loadMahasiswa,
                       icon: const Icon(Icons.refresh, color: Colors.white),

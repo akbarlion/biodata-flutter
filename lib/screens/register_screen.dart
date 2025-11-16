@@ -3,13 +3,14 @@ import 'dart:ui';
 import '../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStateMixin {
+class _RegisterScreenState extends State<RegisterScreen>
+    with TickerProviderStateMixin {
   final TextEditingController namaController = TextEditingController();
   final TextEditingController nimController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -57,14 +58,14 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     setState(() => _isLoading = false);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registrasi berhasil!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Registrasi berhasil!")));
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registrasi gagal")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Registrasi gagal")));
     }
   }
 
@@ -108,11 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [
-              Color(0xFF667eea),
-              Color(0xFF764ba2),
-              Color(0xFF6B73FF),
-            ],
+            colors: [Color(0xFF667eea), Color(0xFF764ba2), Color(0xFF6B73FF)],
           ),
         ),
         child: SafeArea(
@@ -130,11 +127,14 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         alignment: Alignment.topLeft,
                         child: IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      
+
                       // Header
                       Container(
                         width: 80,
@@ -142,7 +142,10 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white.withOpacity(0.2),
-                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 2,
+                          ),
                         ),
                         child: const Icon(
                           Icons.person_add,
@@ -151,7 +154,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         ),
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Glass Card
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
@@ -188,89 +191,126 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                     ),
                                   ),
                                   const SizedBox(height: 32),
-                                  
+
                                   _buildTextField(
                                     controller: namaController,
                                     label: 'Nama Lengkap',
                                     icon: Icons.person_outline,
-                                    validator: (v) => (v == null || v.isEmpty) ? 'Nama tidak boleh kosong' : null,
+                                    validator: (v) => (v == null || v.isEmpty)
+                                        ? 'Nama tidak boleh kosong'
+                                        : null,
                                   ),
-                                  
+
                                   _buildTextField(
                                     controller: nimController,
                                     label: 'NIM',
                                     icon: Icons.badge_outlined,
-                                    validator: (v) => (v == null || v.isEmpty) ? 'NIM tidak boleh kosong' : null,
+                                    validator: (v) => (v == null || v.isEmpty)
+                                        ? 'NIM tidak boleh kosong'
+                                        : null,
                                   ),
-                                  
+
                                   _buildTextField(
                                     controller: emailController,
                                     label: 'Email',
                                     icon: Icons.email_outlined,
                                     keyboardType: TextInputType.emailAddress,
-                                    validator: (v) => (v == null || !v.contains('@')) ? 'Email tidak valid' : null,
+                                    validator: (v) =>
+                                        (v == null || !v.contains('@'))
+                                        ? 'Email tidak valid'
+                                        : null,
                                   ),
-                                  
+
                                   Container(
                                     margin: const EdgeInsets.only(bottom: 16),
                                     decoration: BoxDecoration(
                                       color: Colors.white.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(15),
-                                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.3),
+                                      ),
                                     ),
                                     child: TextFormField(
                                       controller: passwordController,
                                       obscureText: _obscurePassword,
-                                      style: const TextStyle(color: Colors.white),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
                                       decoration: InputDecoration(
                                         labelText: 'Password',
-                                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
-                                        prefixIcon: Icon(Icons.lock_outline, color: Colors.white.withOpacity(0.8)),
+                                        labelStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                        prefixIcon: Icon(
+                                          Icons.lock_outline,
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
                                         suffixIcon: IconButton(
                                           icon: Icon(
-                                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                            color: Colors.white.withOpacity(0.8),
+                                            _obscurePassword
+                                                ? Icons.visibility_off
+                                                : Icons.visibility,
+                                            color: Colors.white.withOpacity(
+                                              0.8,
+                                            ),
                                           ),
-                                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                          onPressed: () => setState(
+                                            () => _obscurePassword =
+                                                !_obscurePassword,
+                                          ),
                                         ),
                                         border: InputBorder.none,
-                                        contentPadding: const EdgeInsets.all(16),
+                                        contentPadding: const EdgeInsets.all(
+                                          16,
+                                        ),
                                       ),
-                                      validator: (v) => (v == null || v.length < 6) ? 'Minimal 6 karakter' : null,
+                                      validator: (v) =>
+                                          (v == null || v.length < 6)
+                                          ? 'Minimal 6 karakter'
+                                          : null,
                                     ),
                                   ),
-                                  
+
                                   _buildTextField(
                                     controller: fakultasController,
                                     label: 'Fakultas',
                                     icon: Icons.school_outlined,
-                                    validator: (v) => (v == null || v.isEmpty) ? 'Fakultas tidak boleh kosong' : null,
+                                    validator: (v) => (v == null || v.isEmpty)
+                                        ? 'Fakultas tidak boleh kosong'
+                                        : null,
                                   ),
-                                  
+
                                   _buildTextField(
                                     controller: prodiController,
                                     label: 'Program Studi',
                                     icon: Icons.book_outlined,
-                                    validator: (v) => (v == null || v.isEmpty) ? 'Program Studi tidak boleh kosong' : null,
+                                    validator: (v) => (v == null || v.isEmpty)
+                                        ? 'Program Studi tidak boleh kosong'
+                                        : null,
                                   ),
-                                  
+
                                   _buildTextField(
                                     controller: angkatanController,
                                     label: 'Angkatan',
                                     icon: Icons.calendar_today_outlined,
                                     keyboardType: TextInputType.number,
-                                    validator: (v) => (v == null || v.isEmpty) ? 'Angkatan tidak boleh kosong' : null,
+                                    validator: (v) => (v == null || v.isEmpty)
+                                        ? 'Angkatan tidak boleh kosong'
+                                        : null,
                                   ),
-                                  
+
                                   const SizedBox(height: 16),
-                                  
+
                                   // Register Button
                                   Container(
                                     width: double.infinity,
                                     height: 56,
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
-                                        colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                                        colors: [
+                                          Color(0xFF667eea),
+                                          Color(0xFF764ba2),
+                                        ],
                                       ),
                                       borderRadius: BorderRadius.circular(15),
                                       boxShadow: [
@@ -286,13 +326,17 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                         backgroundColor: Colors.transparent,
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(15),
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
                                         ),
                                       ),
                                       onPressed: _isLoading
                                           ? null
                                           : () {
-                                              if (_formKey.currentState?.validate() ?? false) {
+                                              if (_formKey.currentState
+                                                      ?.validate() ??
+                                                  false) {
                                                 registerMahasiswa();
                                               }
                                             },
@@ -316,10 +360,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                     ),
                                   ),
                                   const SizedBox(height: 24),
-                                  
+
                                   // Login Link
                                   TextButton(
-                                    onPressed: _isLoading ? null : () => Navigator.pop(context),
+                                    onPressed: _isLoading
+                                        ? null
+                                        : () => Navigator.pop(context),
                                     child: RichText(
                                       text: TextSpan(
                                         text: 'Sudah punya akun? ',
@@ -333,7 +379,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
-                                              decoration: TextDecoration.underline,
+                                              decoration:
+                                                  TextDecoration.underline,
                                             ),
                                           ),
                                         ],

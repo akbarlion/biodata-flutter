@@ -174,6 +174,71 @@ class ApiService {
     }
   }
 
+  Future<bool> createMahasiswa(Map<String, dynamic> data) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) return false;
+
+      final response = await http.post(
+        Uri.parse('${baseUrl.replaceAll('/mahasiswa', '')}/mahasiswa/create'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      ).timeout(const Duration(seconds: 10));
+
+      return response.statusCode == 201 || response.statusCode == 200;
+    } catch (e) {
+      print('Create mahasiswa error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateMahasiswa(int id, Map<String, dynamic> data) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) return false;
+
+      final response = await http.put(
+        Uri.parse('${baseUrl.replaceAll('/mahasiswa', '')}/mahasiswa/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      ).timeout(const Duration(seconds: 10));
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Update mahasiswa error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteMahasiswa(int id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) return false;
+
+      final response = await http.delete(
+        Uri.parse('${baseUrl.replaceAll('/mahasiswa', '')}/mahasiswa/$id'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 10));
+
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print('Delete mahasiswa error: $e');
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');

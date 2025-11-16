@@ -7,13 +7,14 @@ import 'edit_profile_screen.dart';
 import 'mahasiswa_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen>
+    with TickerProviderStateMixin {
   final api = ApiService();
   Mahasiswa? mahasiswa;
   late AnimationController _animationController;
@@ -30,9 +31,13 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutBack,
+          ),
+        );
     _loadProfile();
   }
 
@@ -52,7 +57,12 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     }
   }
 
-  Widget _buildInfoCard(String title, String value, IconData icon, Color color) {
+  Widget _buildInfoCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -113,10 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF667eea),
-              Color(0xFF764ba2),
-            ],
+            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
           ),
         ),
         child: SafeArea(
@@ -153,7 +160,10 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const MahasiswaListScreen()),
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const MahasiswaListScreen(),
+                                        ),
                                       );
                                     },
                                     icon: const Icon(
@@ -166,7 +176,10 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                     onPressed: () async {
                                       await api.logout();
                                       Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginScreen(),
+                                        ),
                                       );
                                     },
                                     icon: const Icon(
@@ -180,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             ],
                           ),
                         ),
-                        
+
                         // Profile Avatar
                         Container(
                           width: 120,
@@ -200,7 +213,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                           ),
                           child: Center(
                             child: Text(
-                              mahasiswa!.nama.isNotEmpty ? mahasiswa!.nama[0].toUpperCase() : '?',
+                              mahasiswa!.nama.isNotEmpty
+                                  ? mahasiswa!.nama[0].toUpperCase()
+                                  : '?',
                               style: const TextStyle(
                                 fontSize: 48,
                                 fontWeight: FontWeight.bold,
@@ -209,9 +224,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Name and Email
                         Text(
                           mahasiswa!.nama,
@@ -229,9 +244,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             color: Colors.white.withOpacity(0.8),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 32),
-                        
+
                         // Info Cards
                         Expanded(
                           child: Container(
@@ -257,37 +272,37 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                     ),
                                   ),
                                   const SizedBox(height: 24),
-                                  
+
                                   _buildInfoCard(
                                     'NIM',
                                     mahasiswa!.nim,
                                     Icons.badge_outlined,
                                     const Color(0xFF667eea),
                                   ),
-                                  
+
                                   _buildInfoCard(
                                     'Fakultas',
                                     mahasiswa!.fakultas,
                                     Icons.school_outlined,
                                     const Color(0xFF764ba2),
                                   ),
-                                  
+
                                   _buildInfoCard(
                                     'Program Studi',
                                     mahasiswa!.prodi,
                                     Icons.book_outlined,
                                     const Color(0xFF6B73FF),
                                   ),
-                                  
+
                                   _buildInfoCard(
                                     'Angkatan',
                                     mahasiswa!.angkatan,
                                     Icons.calendar_today_outlined,
                                     const Color(0xFF9C27B0),
                                   ),
-                                  
+
                                   const SizedBox(height: 24),
-                                  
+
                                   // Action Buttons
                                   Row(
                                     children: [
@@ -296,12 +311,19 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                           height: 56,
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
-                                              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                                              colors: [
+                                                Color(0xFF667eea),
+                                                Color(0xFF764ba2),
+                                              ],
                                             ),
-                                            borderRadius: BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: const Color(0xFF667eea).withOpacity(0.3),
+                                                color: const Color(
+                                                  0xFF667eea,
+                                                ).withOpacity(0.3),
                                                 blurRadius: 10,
                                                 offset: const Offset(0, 5),
                                               ),
@@ -309,21 +331,28 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                                           ),
                                           child: ElevatedButton.icon(
                                             onPressed: () async {
-                                              final result = await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => EditProfileScreen(mahasiswa: mahasiswa!),
-                                                ),
-                                              );
+                                              final result =
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          EditProfileScreen(
+                                                            mahasiswa:
+                                                                mahasiswa!,
+                                                          ),
+                                                    ),
+                                                  );
                                               if (result == true) {
                                                 _loadProfile();
                                               }
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               shadowColor: Colors.transparent,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(16),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
                                               ),
                                             ),
                                             icon: const Icon(
